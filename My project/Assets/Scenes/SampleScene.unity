@@ -145,15 +145,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 469386, guid: afbde1d23e194df4ebd0a82acfcca0dc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.28
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 469386, guid: afbde1d23e194df4ebd0a82acfcca0dc, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.07
+      value: -0.11
       objectReference: {fileID: 0}
     - target: {fileID: 469386, guid: afbde1d23e194df4ebd0a82acfcca0dc, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.02
+      value: -0.01
       objectReference: {fileID: 0}
     - target: {fileID: 469386, guid: afbde1d23e194df4ebd0a82acfcca0dc, type: 3}
       propertyPath: m_LocalRotation.w
@@ -12717,7 +12717,7 @@ Transform:
   m_GameObject: {fileID: 1420840567}
   serializedVersion: 2
   m_LocalRotation: {x: -0.30661044, y: 0.10540504, z: 0.3075393, w: 0.8945945}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.18, y: -0.22, z: 0.17}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12883,7 +12883,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 2.2
+      scalar: 1.5
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -16701,7 +16701,7 @@ ParticleSystem:
         m_RotationOrder: 4
     maxLights: 20
   TrailModule:
-    enabled: 0
+    enabled: 1
     mode: 0
     ratio: 1
     lifetime:
