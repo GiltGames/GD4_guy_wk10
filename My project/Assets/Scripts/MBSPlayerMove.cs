@@ -118,6 +118,15 @@ public class MBSPlayerMove : MonoBehaviour
 
         }
 
+
+        if (Input.GetMouseButton(0))
+        {
+            vMouseX = 0;
+            vMouseY = 0;
+
+        }
+
+
     }
 
     void FnMove()
@@ -136,7 +145,7 @@ public class MBSPlayerMove : MonoBehaviour
         vLookDirUpDown += vMouseY * Time.deltaTime * vTurnUpSpeed;
         Mathf.Clamp(vLookDirUpDown, -vLookUpLimit, vLookUpLimit);
 
-        gEyes.transform.localRotation = Quaternion.Euler(vLookDirUpDown, 0, 0);
+        gEyes.transform.localRotation = Quaternion.Euler(vLookDirUpDown, 90, 0);
 
 
 
@@ -173,9 +182,12 @@ public class MBSPlayerMove : MonoBehaviour
                 vStamina -= vStaminaJumpCost;
             }
 
-            vMoveDir = transform.forward * vForward;
-            vMoveDirSide += transform.right * vSideway;
+            vMoveDir = transform.right * vForward;
+            vMoveDirSide += transform.forward * vSideway;
             vMoveDir = vMoveDir * Time.deltaTime * vPlayerMoveSpeed;
+            vMoveDirSide *= Time.deltaTime * vPlayerMoveSpeed;
+
+
             if (isRunKey)
             {
                 vMoveDir *= vRunMultiplier;

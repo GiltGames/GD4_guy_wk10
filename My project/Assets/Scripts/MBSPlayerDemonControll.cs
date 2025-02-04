@@ -1,9 +1,11 @@
 using UnityEngine;
+using System.Collections;
+using TMPro;
 
 public class MBSPlayerDemonControll : MonoBehaviour
 {
     [SerializeField] MBSDemon mbsDemon;
-    [SerializeField] bool isMouseDown;
+    public bool isMouseDown;
     [SerializeField] bool isClickFrame;
     [SerializeField] bool isMouseUp;
     [SerializeField] float vMouseX;
@@ -12,6 +14,15 @@ public class MBSPlayerDemonControll : MonoBehaviour
     [SerializeField] float vRotateX;
     [SerializeField] float vRotateY;
     [SerializeField] float vRotateSensitivity;
+    public float vMana;
+   public float vManaMax;
+    [SerializeField] float vManaUsed;
+    public float vManaRecovery;
+    public float vManaRecoveryDelay;
+   public GameObject gManaRecovery;
+    [SerializeField] TextMeshProUGUI tMana;
+   public bool isRecover;
+    public float vRecoveryStartTime;
 
     
     
@@ -20,12 +31,16 @@ public class MBSPlayerDemonControll : MonoBehaviour
     {
         mbsDemon = FindFirstObjectByType<MBSDemon>();
         gDemon = FindFirstObjectByType<MBSDemon>().transform;
+
+        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-    
+        tMana.text = "Mana: "+vMana;
+
         isClickFrame = Input.GetMouseButtonDown(0);
         isMouseDown = Input.GetMouseButton(0);
         isMouseUp = Input.GetMouseButtonUp(0);
@@ -41,7 +56,14 @@ public class MBSPlayerDemonControll : MonoBehaviour
             {
                 mbsDemon.iDemonState = 1;
 
+                
+
+
+
             }
+
+
+           
 
         }
 
@@ -51,6 +73,20 @@ public class MBSPlayerDemonControll : MonoBehaviour
             if (isMouseDown)
             {
                 mbsDemon.vDemonPower += mbsDemon.vDemonPowerIncrease * Time.deltaTime;
+
+                if (mbsDemon.vDemonPower > mbsDemon.vDemonPowerMax)
+                {
+                    mbsDemon.vDemonPower = mbsDemon.vDemonPowerMax;
+                }
+
+                vMana -= vManaUsed*Time.deltaTime;
+                if (vMana <= 0)
+                {
+                    vMana = 0;
+                    mbsDemon.iDemonState = 0;
+                    mbsDemon.FnExplode();
+                    isRecover = true;
+                }
 
             }
             if (isMouseUp)
@@ -68,15 +104,16 @@ public class MBSPlayerDemonControll : MonoBehaviour
             {
 
                 mbsDemon.iDemonState = 3;
+                isRecover = true;
 
             }
 
-            vRotateY = vMouseX * vRotateSensitivity *Time.deltaTime;
+        /*    vRotateY = vMouseX * vRotateSensitivity *Time.deltaTime;
             vRotateX = vMouseY * vRotateSensitivity * Time.deltaTime;
 
-            gDemon.Rotate(vRotateX, vRotateY, 0);
+            gDemon.Rotate(0, vRotateY, vRotateX);
 
-
+            */
 
         }
 
@@ -85,6 +122,5 @@ public class MBSPlayerDemonControll : MonoBehaviour
 
     }
 
-
-
+   
 }

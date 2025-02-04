@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class MBSDemon : MonoBehaviour
 {
@@ -8,7 +9,7 @@ public class MBSDemon : MonoBehaviour
     [SerializeField] Transform gForceDemon;
     [SerializeField] Transform gCurrentDemon;
     public float vDemonPower;
-    [SerializeField] float vDemonPowerMax;
+    public float vDemonPowerMax;
     public float vDemonPowerIncrease;
     [SerializeField] Transform gLeftHand;
     [SerializeField] float vNormalSize;
@@ -16,6 +17,20 @@ public class MBSDemon : MonoBehaviour
     [SerializeField] float vCurrentSize;
     [SerializeField] float vSpeedBase;
     [SerializeField] float vSpeed;
+    [SerializeField] NavMeshAgent navDemon;
+    [SerializeField] Vector3 vHoming;
+    [SerializeField] float vHomeSpeed;
+    [SerializeField] ParticleSystem gCurrentPower;
+    [SerializeField] ParticleSystem gForcePower;
+    [SerializeField] float vBaseSpeed;
+    [SerializeField] float vTopSpeedMultiple;
+    [SerializeField] Rigidbody rb;
+    public Vector3 vTargetLocation;
+    [SerializeField] MBSAim mbsAim;
+    [SerializeField] Transform vDirPoint;
+    [SerializeField] SphereCollider colliderDemon;
+    [SerializeField] GameObject vExpodeSource;
+    
     
 
 
@@ -23,7 +38,10 @@ public class MBSDemon : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        navDemon = GetComponent<NavMeshAgent>();
+       // navDemon.isStopped = true;
+      colliderDemon=GetComponent<SphereCollider>();  
+
     }
 
     // Update is called once per frame
@@ -34,6 +52,10 @@ public class MBSDemon : MonoBehaviour
 
         {
             gCurrentDemon = gForceDemon;
+            gCurrentPower = gForcePower;
+            var mainMod = gCurrentPower.GetComponent<ParticleSystem>().main;
+            
+
 
 
         }
@@ -61,22 +83,37 @@ public class MBSDemon : MonoBehaviour
 
         }
 
+        if(iDemonState ==3)
+        {
+            FnDemonState3();
+
+        }
+
+
 
     }
 
     void FnDemonState0()
 
     {
+        colliderDemon.enabled = false;
+        // navDemon.isStopped = true;
         transform.position = gLeftHand.position;
         transform.localScale = new Vector3(vNormalSize, vNormalSize, vNormalSize);
+        vDemonPower = 0;
+        transform.rotation = gLeftHand.rotation;
 
     }
 
     void FnDemonState1()
     {
+      
         transform.position = gLeftHand.position;
         vCurrentSize = vNormalSize + (vMaxSize - vNormalSize) * (vDemonPower / vDemonPowerMax);
-        transform.localScale = new Vector3(vCurrentSize, vCurrentSize, vCurrentSize);   
+        transform.localScale = new Vector3(vCurrentSize, vCurrentSize, vCurrentSize);
+        var mainMod = gCurrentPower.GetComponent<ParticleSystem>().main;
+        
+        mainMod.startSpeed = vBaseSpeed + (vDemonPower / vDemonPowerMax) * vTopSpeedMultiple;
 
 
 
@@ -85,12 +122,110 @@ public class MBSDemon : MonoBehaviour
 
     void FnDemonState2()
     {
-        //vSpeed = 
 
-       // transform.Translate()
+        colliderDemon.enabled = true;
+        vSpeed = vSpeedBase * (vDemonPower/ vDemonPowerMax) *Time.deltaTime;
+
+        vDirPoint.localPosition = vTargetLocation;
+       
+        transform.rotation = Quaternion.identity;
+        transform.Translate(vTargetLocation * vSpeed);
+
+        
+
+
+    }
+
+    void FnDemonState3()
+    {
+        colliderDemon.enabled = false;
+        vHoming = gLeftHand.transform.position - transform.position;
+        vDirPoint.localPosition = vHoming.normalized;
+        transform.rotation = Quaternion.identity;
+        transform.Translate(vHoming.normalized * Time.deltaTime * vHomeSpeed);
+
+        var mainMod = gCurrentPower.GetComponent<ParticleSystem>().main;
+
+        mainMod.startSpeed = vBaseSpeed;
+
+        if (vHoming.magnitude <.5f)
+        {
+            iDemonState = 0;
+
+        }
+        
+
+
+    }
+
+
+
+    void OnTriggerEnter(Collider other)
+    {
+
+        Debug.Log("hit: " + other.tag);
+        if (other.tag == "Finish" && iDemonState ==3)
+
+        {
+            iDemonState = 0;
+
+
+        }
+
+        if (other.tag == "Solid")
+        {
+            iDemonState = 3;
+
+            FnExplode();
+        }
+
+        if (other.tag == "Breakable")
+        {
+            iDemonState = 3;
+
+            FnExplode();
+
+            FnKnock(other.transform);
+
+            other.GetComponent<ShootableBox>().Damage(Mathf.FloorToInt(vDemonPower));
+
+        }
 
 
 
     }
+
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("Collided with" + collision.transform.name);
+        iDemonState = 3;
+
+    }
+
+
+
+    public void FnExplode()
+
+    {
+        Destroy(Instantiate(vExpodeSource, transform.position, Quaternion.identity),3);
+
+    }
+
+    void FnKnock(Transform other)
+    {
+
+        Rigidbody rb = other.GetComponent<Rigidbody>();
+
+        if (rb != null)
+        {
+
+            rb.AddForce((other.position - transform.position) * vDemonPower,ForceMode.Impulse);
+
+        }
+
+
+    }
+
 
 }
