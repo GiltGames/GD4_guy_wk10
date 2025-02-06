@@ -25,6 +25,13 @@ public class MBSRag3 : MonoBehaviour
 
         }
 
+        foreach (Collider col in GetComponentsInChildren<Collider>())
+        {
+            col.enabled = true;
+
+        }
+
+        GetComponent<Collider>().enabled = true;
     }
 
 
@@ -34,6 +41,12 @@ public class MBSRag3 : MonoBehaviour
         {
 
             bone.isKinematic = true;
+
+        }
+
+        foreach (Collider col in GetComponentsInChildren<Collider>())
+        {
+            col.enabled = false;
 
         }
 

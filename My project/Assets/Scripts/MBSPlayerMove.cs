@@ -186,7 +186,7 @@ public class MBSPlayerMove : MonoBehaviour
             }
 
             vMoveDir = transform.right * vForward;
-            vMoveDirSide += transform.forward * vSideway;
+            vMoveDirSide += transform.forward * -vSideway;
             vMoveDir = vMoveDir * Time.deltaTime * vPlayerMoveSpeed;
             vMoveDirSide *= Time.deltaTime * vPlayerMoveSpeed;
 

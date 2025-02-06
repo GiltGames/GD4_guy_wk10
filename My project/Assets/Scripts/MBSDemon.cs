@@ -246,7 +246,14 @@ public class MBSDemon : MonoBehaviour
 
         }
 
+        if (other.tag == "Enemy")
 
+        {
+            other.gameObject.GetComponent<MBSEnemy>().Damage(Mathf.FloorToInt(vDemonPower * vCurrentDamageMult * vDamageBase));
+            FnExplode();
+            iDemonState = 3;
+
+        }
 
     }
 
@@ -255,6 +262,9 @@ public class MBSDemon : MonoBehaviour
     {
         Debug.Log("Collided with" + collision.transform.name);
         iDemonState = 3;
+
+       
+
 
     }
 

@@ -34,7 +34,7 @@ public class MBSWandAttack : MonoBehaviour
     void Update()
     {
         
-        if (Input.GetKeyDown(KeyCode.LeftControl) && mbsDemon.iDemonState == 0)
+        if (Input.GetKeyDown(KeyCode.LeftControl) && mbsDemon.iDemonState == 0 && !isWandAttack)
         {
             StartCoroutine(FnWand());
            // Cursor.visible = true;
@@ -74,23 +74,24 @@ public class MBSWandAttack : MonoBehaviour
         vMouseFinal.y = vMouseFinal.y * Random.Range(1 - vVarianceOnAttack, 1 + vVarianceOnAttack);
 
         gObjectHit = mbsAim.FnAim(vMouseFinal);
-
-        Debug.Log("lightning hits " +  gObjectHit.name);
-
-        if (gObjectHit.GetComponent<ShootableBox>() != null)
+        if (gObjectHit != null)
         {
+            Debug.Log("lightning hits " + gObjectHit.name);
 
-            
-            gObjectHit.GetComponent<Rigidbody>().AddForce((gObjectHit.position - gWandEnd.position).normalized * vWandForce, ForceMode.Impulse);
+            if (gObjectHit.GetComponent<ShootableBox>() != null)
+            {
 
+
+                gObjectHit.GetComponent<Rigidbody>().AddForce((gObjectHit.position - gWandEnd.position).normalized * vWandForce, ForceMode.Impulse);
+        }
             if (gObjectHit.tag == "Enemy")
             {
-                gObjectHit.GetComponent<ShootableBox>().Damage(vWandDamage);
+                gObjectHit.GetComponent<MBSEnemy>().Damage(vWandDamage);
 
             }
 
+            
         }
-
 isWandAttack = false;
 
         vFlickertime = Time.time + vLightningOn;

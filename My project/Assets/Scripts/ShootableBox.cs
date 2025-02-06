@@ -10,12 +10,13 @@ public class ShootableBox : MonoBehaviour {
 	[SerializeField] int maxHealth = 30;
 	[SerializeField] GameObject aura;
 	[SerializeField] float vFade =.5f;
+	
 
 	void Start()
 	{
-
+		
 		vFade = 0.3f;
-
+	
 	}
 
 
@@ -38,7 +39,10 @@ public class ShootableBox : MonoBehaviour {
 		if (currentHealth <= 0) 
 		{
 			//if health has fallen below zero, deactivate it 
-			Destroy(gameObject);
+
+		
+			GetComponent<Collider>().enabled = false;	
+
 		}
 
 
