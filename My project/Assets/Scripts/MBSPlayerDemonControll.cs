@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using TMPro;
+using UnityEngine.UI;
 
 public class MBSPlayerDemonControll : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class MBSPlayerDemonControll : MonoBehaviour
     [SerializeField] bool isMouseUp;
     [SerializeField] float vMouseX;
     [SerializeField] float vMouseY;
+    [SerializeField] bool isMouseWheelPress;
     [SerializeField] Transform gDemon;
     [SerializeField] float vRotateX;
     [SerializeField] float vRotateY;
@@ -23,7 +25,10 @@ public class MBSPlayerDemonControll : MonoBehaviour
     [SerializeField] TextMeshProUGUI tMana;
    public bool isRecover;
     public float vRecoveryStartTime;
+    [SerializeField] Slider sMana;
+    [SerializeField] int vNoofDemons =2 ;
 
+    [SerializeField] MBSWandAttack mbsWandAttack;
     
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -31,6 +36,7 @@ public class MBSPlayerDemonControll : MonoBehaviour
     {
         mbsDemon = FindFirstObjectByType<MBSDemon>();
         gDemon = FindFirstObjectByType<MBSDemon>().transform;
+        mbsWandAttack = FindFirstObjectByType<MBSWandAttack>();
 
         
 
@@ -40,12 +46,29 @@ public class MBSPlayerDemonControll : MonoBehaviour
     void Update()
     {
         tMana.text = "Mana: "+vMana;
+        sMana.value = vMana;
 
         isClickFrame = Input.GetMouseButtonDown(0);
         isMouseDown = Input.GetMouseButton(0);
         isMouseUp = Input.GetMouseButtonUp(0);
         vMouseX = Input.GetAxis("MouseX");
         vMouseY = Input.GetAxis("MouseY");
+        isMouseWheelPress = Input.GetMouseButtonDown(2);
+
+
+
+        if (isMouseWheelPress && mbsDemon.iDemonState ==0)
+        {
+            mbsDemon.iDemonType +=1;
+
+            if (mbsDemon.iDemonType == vNoofDemons)
+            {
+                mbsDemon.iDemonType = 0;
+            }
+
+
+
+        }
 
 
 
@@ -57,6 +80,7 @@ public class MBSPlayerDemonControll : MonoBehaviour
                 mbsDemon.iDemonState = 1;
 
                 
+
 
 
 
@@ -123,4 +147,8 @@ public class MBSPlayerDemonControll : MonoBehaviour
     }
 
    
+
+
+
+
 }

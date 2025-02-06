@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Solid
   - Breakable
+  - Aura
+  - Enemy
   layers:
   - Default
   - TransparentFX

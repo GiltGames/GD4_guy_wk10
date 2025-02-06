@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MBSAim : MonoBehaviour
@@ -22,6 +23,8 @@ public class MBSAim : MonoBehaviour
     [SerializeField] Camera cCam;
     [SerializeField] Transform gTarget;
     [SerializeField] Vector3 vMouseonScreenPos;
+    [SerializeField] Transform gTargetImage;
+    [SerializeField] Transform  gObjectHit;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -44,11 +47,12 @@ public class MBSAim : MonoBehaviour
             {
                
                 
-                Cursor.visible = true;
+                //Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.Confined;
                 lineRenderer.enabled = true;
                 tAim.text = "Aim Mode";
                 gTarget.gameObject.SetActive(true);
+                gTargetImage.gameObject.SetActive(true);
 
             }
          
@@ -56,40 +60,8 @@ public class MBSAim : MonoBehaviour
             if (Input.GetMouseButton(0))
 
             {
-
-                vMouseonScreenPos = Input.mousePosition;
-                vMouseonScreenPos.z = 0.1f;
-
-
-                vRayOrigin = cCam.ScreenToWorldPoint(vMouseonScreenPos);
-
-                vRayDirection = vRayOrigin - cCam.transform.position;
-
-
-                if (Physics.Raycast(vRayOrigin,vRayDirection,  out vRaycastHit, vRange) )
-                {
-
-
-                    vRayEnd = vRaycastHit.point;
-
-                    gTarget.gameObject.SetActive(true );
-                    gTarget.position = vRayEnd;
-                    tAim2.text = "Hit " + vRaycastHit.collider.name;
-
-                }
-                else
-                {
-                    
-
-
-                    vRayEnd = vRayOrigin + vRayDirection * vRange;
-                    gTarget.gameObject.SetActive(true);
-                    gTarget.position = vRayOrigin;
-                    tAim2.text = "";
-                }
-
-                tAim2.text = "Mouse " + Input.mousePosition+ " \n Ray Origin" + vRayOrigin + "\n Ray End" + vRayEnd  ;
-
+                
+                FnAim(Input.mousePosition);
 
 
 
@@ -111,15 +83,62 @@ public class MBSAim : MonoBehaviour
            if (Input.GetMouseButtonUp(0)) 
             {
                 Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
+               // Cursor.visible = false;
                 lineRenderer.enabled = false;
 
 
                 tAim.text = "";
                 tAim2.text = "";
                 gTarget.gameObject.SetActive(false);
+                gTargetImage.gameObject.SetActive(false);
             }
 
         }
     }
+
+
+    public Transform FnAim(Vector3 vMouseonScreenPosTmp)
+    {
+
+        
+        vMouseonScreenPosTmp.z = 0.1f;
+
+
+        vRayOrigin = cCam.ScreenToWorldPoint(vMouseonScreenPosTmp);
+
+        vRayDirection = vRayOrigin - cCam.transform.position;
+
+
+        if (Physics.Raycast(vRayOrigin, vRayDirection, out vRaycastHit, vRange))
+        {
+
+
+            vRayEnd = vRaycastHit.point;
+
+            gTarget.gameObject.SetActive(true);
+            gTarget.position = vRayEnd;
+            tAim2.text = "Hit " + vRaycastHit.collider.name;
+
+            gObjectHit = vRaycastHit.collider.transform;
+            return gObjectHit;
+
+        }
+        else
+        {
+
+
+
+            vRayEnd = vRayOrigin + vRayDirection * vRange;
+            gTarget.gameObject.SetActive(true);
+            gTarget.position = vRayOrigin;
+            tAim2.text = "";
+
+            return null;
+        }
+
+        tAim2.text = "Mouse " + Input.mousePosition + " \n Ray Origin" + vRayOrigin + "\n Ray End" + vRayEnd;
+
+
+    }
+
 }

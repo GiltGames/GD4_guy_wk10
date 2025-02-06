@@ -6,8 +6,8 @@ public class MBSDemon : MonoBehaviour
    public int iDemonState;
     public int iDemonType;
 
-    [SerializeField] Transform gForceDemon;
-    [SerializeField] Transform gCurrentDemon;
+    
+   
     public float vDemonPower;
     public float vDemonPowerMax;
     public float vDemonPowerIncrease;
@@ -20,21 +20,50 @@ public class MBSDemon : MonoBehaviour
     [SerializeField] NavMeshAgent navDemon;
     [SerializeField] Vector3 vHoming;
     [SerializeField] float vHomeSpeed;
-    [SerializeField] ParticleSystem gCurrentPower;
-    [SerializeField] ParticleSystem gForcePower;
+
+   
     [SerializeField] float vBaseSpeed;
     [SerializeField] float vTopSpeedMultiple;
+   
+   
     [SerializeField] Rigidbody rb;
     public Vector3 vTargetLocation;
     [SerializeField] MBSAim mbsAim;
     [SerializeField] Transform vDirPoint;
     [SerializeField] SphereCollider colliderDemon;
     [SerializeField] GameObject vExpodeSource;
-    
-    
+
+    [Header("Current Demon")]
+    [SerializeField] Transform gCurrentDemon;
+    [SerializeField] float vCurrentDamageMult;
+    [SerializeField] ParticleSystem gCurrentPower;
+    [SerializeField] float vDamageBase;
+    [SerializeField] float vCurrentSpeedMult;
+    [SerializeField] float vCurrentForceMult;
+    [SerializeField] GameObject gCurrentShield;
 
 
-    
+    [Header("Force Demon")]
+    [SerializeField] float vForceSpeedMult =1;
+    [SerializeField] float vForceDamageMult =1;
+    [SerializeField] ParticleSystem gForcePower;
+    [SerializeField] float vForceForceMult =1;
+    [SerializeField] Transform gForceDemon;
+    [SerializeField] GameObject gForceExpode;
+    [SerializeField] GameObject gForceShield;
+
+    [Header("Fire Demon")]
+    [SerializeField] float vFireDamageMult =2;
+    [SerializeField] float vFireSpeedMult = 2;
+    [SerializeField] float vFireForceMult = .3f;
+    [SerializeField] ParticleSystem gFirePower;
+    [SerializeField] Transform gFireDemon;
+    [SerializeField] GameObject gFireExpode;
+    [SerializeField] GameObject gFireShield;
+
+
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -53,13 +82,39 @@ public class MBSDemon : MonoBehaviour
         {
             gCurrentDemon = gForceDemon;
             gCurrentPower = gForcePower;
-            var mainMod = gCurrentPower.GetComponent<ParticleSystem>().main;
             
-
-
-
+            vCurrentDamageMult = vForceDamageMult;
+            vCurrentSpeedMult = vForceSpeedMult;
+            vCurrentForceMult = vForceForceMult;
+            
+            var mainMod = gCurrentPower.GetComponent<ParticleSystem>().main;
+            gFireDemon.gameObject.SetActive(false);
+            gCurrentDemon.gameObject.SetActive(true);
+            vExpodeSource = gForceExpode;
+            gForceShield.SetActive(true);
+            gFireShield.SetActive(false);
         }
 
+
+        if (iDemonType == 1)
+        {
+
+            gCurrentDemon = gFireDemon;
+            gCurrentPower = gFirePower;
+
+            vCurrentDamageMult = vFireDamageMult;
+            vCurrentSpeedMult = vFireSpeedMult;
+            vCurrentForceMult = vFireForceMult;
+
+            var mainMod = gCurrentPower.GetComponent<ParticleSystem>().main;
+            vExpodeSource = gFireExpode;
+
+            gForceDemon.gameObject.SetActive(false);
+            gCurrentDemon.gameObject.SetActive(true);
+            gForceShield.SetActive(false);
+            gFireShield.SetActive(true);
+
+        }
 
         // Demon states
         // 0 - neutral
@@ -129,7 +184,7 @@ public class MBSDemon : MonoBehaviour
         vDirPoint.localPosition = vTargetLocation;
        
         transform.rotation = Quaternion.identity;
-        transform.Translate(vTargetLocation * vSpeed);
+        transform.Translate(vTargetLocation * vSpeed * vCurrentSpeedMult);
 
         
 
@@ -187,7 +242,7 @@ public class MBSDemon : MonoBehaviour
 
             FnKnock(other.transform);
 
-            other.GetComponent<ShootableBox>().Damage(Mathf.FloorToInt(vDemonPower));
+            other.GetComponent<ShootableBox>().Damage(Mathf.FloorToInt(vDemonPower * vCurrentDamageMult * vDamageBase));
 
         }
 
@@ -220,7 +275,7 @@ public class MBSDemon : MonoBehaviour
         if (rb != null)
         {
 
-            rb.AddForce((other.position - transform.position) * vDemonPower,ForceMode.Impulse);
+            rb.AddForce((other.position - transform.position).normalized * vDemonPower*vCurrentForceMult,ForceMode.Impulse);
 
         }
 

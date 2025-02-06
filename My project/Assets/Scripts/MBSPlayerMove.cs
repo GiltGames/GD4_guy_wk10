@@ -46,17 +46,18 @@ public class MBSPlayerMove : MonoBehaviour
     [SerializeField] float vStaminaRunCost;
     [SerializeField] Slider gSlider;
     [SerializeField] Slider gSliderDelay;
+    [SerializeField] MBSWandAttack mbsWandAttack;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         cCamera = Camera.main;
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
+        
         isInput = true;
         gEyes = transform.Find("EyePos");
         gController = GetComponent<CharacterController>();
+        mbsWandAttack = FindFirstObjectByType<MBSWandAttack>();
        
 
     }
@@ -119,8 +120,10 @@ public class MBSPlayerMove : MonoBehaviour
         }
 
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) || mbsWandAttack.isWandAttack )
         {
+            // prevents mouse moving the view if either the mouse button is down, or wand attack is active
+
             vMouseX = 0;
             vMouseY = 0;
 
