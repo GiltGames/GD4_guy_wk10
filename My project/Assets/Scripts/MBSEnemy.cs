@@ -38,6 +38,9 @@ public class MBSEnemy : MonoBehaviour
     [SerializeField] float vAttackAimErrorSpecific;
     [SerializeField] float vForceMagic;
     [SerializeField] float vForceMelee;
+    [SerializeField] Transform gWeapon;
+    public bool isHitPlayer;
+
     [SerializeField] float vDamageMagic;
     [SerializeField] float vDamageMelee;
     [SerializeField] float vStopThreshold;
@@ -144,7 +147,9 @@ public class MBSEnemy : MonoBehaviour
         if (vState ==2  && vDistance < vMeleeRange)
         {
             vState = 4;
+            isHitPlayer = false;
             animator.SetTrigger("Attack");
+            gWeapon.gameObject.SetActive(true);
            
             vTimeAttackEnd = Time.time + vTimeAttackTakes;
 
@@ -264,12 +269,18 @@ public class MBSEnemy : MonoBehaviour
     {
         agent.destination = transform.position;
         
+        if(isHitPlayer)
+        {
+
+
+        }
+
         
         if (vTimeAttackEnd < Time.time)
         {
             animator.SetBool("Walk", true);
             vState = 2;
-
+            gWeapon.gameObject.SetActive(true);
 
         }
 

@@ -8,6 +8,9 @@ TagManager:
   - Breakable
   - Aura
   - Enemy
+  - TStart
+  - HStart
+  - Ground
   layers:
   - Default
   - TransparentFX
