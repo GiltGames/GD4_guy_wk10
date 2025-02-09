@@ -21,6 +21,8 @@ public class MBSDemon : MonoBehaviour
     [SerializeField] Vector3 vHoming;
     [SerializeField] float vHomeSpeed;
 
+    [SerializeField] MBSPlayerDemonControll mbsPlayer;
+
    
     [SerializeField] float vBaseSpeed;
     [SerializeField] float vTopSpeedMultiple;
@@ -32,6 +34,8 @@ public class MBSDemon : MonoBehaviour
     [SerializeField] Transform vDirPoint;
     [SerializeField] SphereCollider colliderDemon;
     [SerializeField] GameObject vExpodeSource;
+    public AudioSource aSource;
+
 
     [Header("Current Demon")]
     [SerializeField] Transform gCurrentDemon;
@@ -41,6 +45,8 @@ public class MBSDemon : MonoBehaviour
     [SerializeField] float vCurrentSpeedMult;
     [SerializeField] float vCurrentForceMult;
     [SerializeField] GameObject gCurrentShield;
+    public bool isShield;
+    [SerializeField] AudioClip aAttackClip;
 
 
     [Header("Force Demon")]
@@ -51,6 +57,8 @@ public class MBSDemon : MonoBehaviour
     [SerializeField] Transform gForceDemon;
     [SerializeField] GameObject gForceExpode;
     [SerializeField] GameObject gForceShield;
+    [SerializeField] AudioClip aForceClip;
+
 
     [Header("Fire Demon")]
     [SerializeField] float vFireDamageMult =2;
@@ -60,7 +68,12 @@ public class MBSDemon : MonoBehaviour
     [SerializeField] Transform gFireDemon;
     [SerializeField] GameObject gFireExpode;
     [SerializeField] GameObject gFireShield;
+    [SerializeField] AudioClip aFireClip;
 
+    [Header("Null Demon")]
+    [SerializeField] Transform gNullDemon;
+    [SerializeField] ParticleSystem gNullParticles;
+    [SerializeField] AudioClip aLightningClip;
 
 
 
@@ -70,6 +83,8 @@ public class MBSDemon : MonoBehaviour
         navDemon = GetComponent<NavMeshAgent>();
        // navDemon.isStopped = true;
       colliderDemon=GetComponent<SphereCollider>();  
+        mbsPlayer = FindFirstObjectByType<MBSPlayerDemonControll>();
+        aSource = GetComponent<AudioSource>();
 
     }
 
@@ -91,6 +106,10 @@ public class MBSDemon : MonoBehaviour
             gFireDemon.gameObject.SetActive(false);
             gCurrentDemon.gameObject.SetActive(true);
             vExpodeSource = gForceExpode;
+            gNullDemon.gameObject.SetActive(false);
+            aAttackClip = aForceClip;
+            aSource.clip = aAttackClip;
+
             gForceShield.SetActive(true);
             gFireShield.SetActive(false);
         }
@@ -108,6 +127,10 @@ public class MBSDemon : MonoBehaviour
 
             var mainMod = gCurrentPower.GetComponent<ParticleSystem>().main;
             vExpodeSource = gFireExpode;
+            gNullDemon.gameObject.SetActive(false);
+
+            aAttackClip = aFireClip;
+            aSource.clip = aAttackClip;
 
             gForceDemon.gameObject.SetActive(false);
             gCurrentDemon.gameObject.SetActive(true);
@@ -115,6 +138,48 @@ public class MBSDemon : MonoBehaviour
             gFireShield.SetActive(true);
 
         }
+
+        if (iDemonType == 2)
+        {
+
+            gCurrentDemon = gNullDemon;
+            gCurrentPower = gNullParticles;
+
+            vCurrentDamageMult = 0;
+            vCurrentSpeedMult = 0;
+            vCurrentForceMult = 0;
+
+            var mainMod = gCurrentPower.GetComponent<ParticleSystem>().main;
+            vExpodeSource = null;
+
+            gFireDemon.gameObject.SetActive(false);
+            gForceDemon.gameObject.SetActive(false);
+            gCurrentDemon.gameObject.SetActive(true);
+            gForceShield.SetActive(false);
+            gFireShield.SetActive(false);
+            aAttackClip = aLightningClip;
+            aSource.clip = aAttackClip;
+
+
+
+        }
+
+
+        if (isShield)
+        {
+            gCurrentShield.SetActive(true);
+            mbsPlayer.vMana -= mbsPlayer.vShieldUse * Time.deltaTime;
+
+
+        }
+
+        else
+
+        {
+            gCurrentShield.SetActive(false);
+            
+                }
+
 
         // Demon states
         // 0 - neutral
@@ -177,7 +242,7 @@ public class MBSDemon : MonoBehaviour
 
     void FnDemonState2()
     {
-
+       
         colliderDemon.enabled = true;
         vSpeed = vSpeedBase * (vDemonPower/ vDemonPowerMax) *Time.deltaTime;
 
@@ -186,7 +251,7 @@ public class MBSDemon : MonoBehaviour
         transform.rotation = Quaternion.identity;
         transform.Translate(vTargetLocation * vSpeed * vCurrentSpeedMult);
 
-        
+  
 
 
     }
@@ -218,14 +283,14 @@ public class MBSDemon : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
 
-        Debug.Log("hit: " + other.tag);
-        if (other.tag == "Finish" && iDemonState ==3)
+        Debug.Log("hit: " + other.tag + "name" + other.name);
+       // if (other.tag == "Finish" && iDemonState ==3)
 
-        {
-            iDemonState = 0;
+        //{
+          //  iDemonState = 0;
 
 
-        }
+        //}
 
         if (other.tag == "Solid")
         {
@@ -236,13 +301,15 @@ public class MBSDemon : MonoBehaviour
 
         if (other.tag == "Breakable")
         {
+           Debug.Log ("Hit Breakabel - " + other.name);
+            
             iDemonState = 3;
 
             FnExplode();
 
             FnKnock(other.transform);
 
-            other.GetComponent<ShootableBox>().Damage(Mathf.FloorToInt(vDemonPower * vCurrentDamageMult * vDamageBase));
+            other.gameObject.GetComponent<ShootableBox>().Damage(Mathf.FloorToInt(vDemonPower * vCurrentDamageMult * vDamageBase));
 
         }
 

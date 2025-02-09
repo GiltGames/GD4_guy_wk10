@@ -12,12 +12,17 @@ public class MBSPlayerDemonControll : MonoBehaviour
     [SerializeField] float vMouseX;
     [SerializeField] float vMouseY;
     [SerializeField] bool isMouseWheelPress;
+    [SerializeField] float vMouseScroll;
+    [SerializeField] bool isRightMouse;
+
     [SerializeField] Transform gDemon;
     [SerializeField] float vRotateX;
     [SerializeField] float vRotateY;
     [SerializeField] float vRotateSensitivity;
     public float vMana;
    public float vManaMax;
+    public float vShieldUse=10;
+
     [SerializeField] float vManaUsed;
     public float vManaRecovery;
     public float vManaRecoveryDelay;
@@ -26,7 +31,7 @@ public class MBSPlayerDemonControll : MonoBehaviour
    public bool isRecover;
     public float vRecoveryStartTime;
     [SerializeField] Slider sMana;
-    [SerializeField] int vNoofDemons =2 ;
+    [SerializeField] int vNoofDemons =3 ;
 
     [SerializeField] MBSWandAttack mbsWandAttack;
     
@@ -54,11 +59,19 @@ public class MBSPlayerDemonControll : MonoBehaviour
         vMouseX = Input.GetAxis("MouseX");
         vMouseY = Input.GetAxis("MouseY");
         isMouseWheelPress = Input.GetMouseButtonDown(2);
+        vMouseScroll = Input.GetAxis("Mouse ScrollWheel");
+        isRightMouse = Input.GetMouseButton(1);
+
+        
 
 
 
-        if (isMouseWheelPress && mbsDemon.iDemonState ==0)
+
+
+        if ( isMouseWheelPress && mbsDemon.iDemonState ==0)
         {
+            mbsWandAttack.isWandAttack = false;
+            
             mbsDemon.iDemonType +=1;
 
             if (mbsDemon.iDemonType == vNoofDemons)
@@ -71,9 +84,24 @@ public class MBSPlayerDemonControll : MonoBehaviour
         }
 
 
+        if (isRightMouse && mbsDemon.iDemonState==0)
+        {
+            mbsDemon.isShield = true;
 
 
-        if (mbsDemon.iDemonState == 0 )
+        }
+
+        else
+        {
+           mbsDemon.isShield= false;
+
+        }
+
+
+
+
+
+        if (mbsDemon.iDemonState == 0 && mbsDemon.iDemonType < (vNoofDemons-1))
         {
             if (isClickFrame)
             {
@@ -108,7 +136,9 @@ public class MBSPlayerDemonControll : MonoBehaviour
                 {
                     vMana = 0;
                     mbsDemon.iDemonState = 0;
-                    mbsDemon.FnExplode();
+                    
+
+
                     isRecover = true;
                 }
 
@@ -116,7 +146,7 @@ public class MBSPlayerDemonControll : MonoBehaviour
             if (isMouseUp)
             {
                 mbsDemon.iDemonState = 2;
-
+                mbsDemon.aSource.Play();
             }
 
 

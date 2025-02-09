@@ -20,6 +20,7 @@ public class MBSWandAttack : MonoBehaviour
     [SerializeField] Transform gObjectHit;
     [SerializeField] int vWandDamage;
     [SerializeField] int vWandForce;
+    [SerializeField] int vDemonWandIndex =2;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -34,7 +35,7 @@ public class MBSWandAttack : MonoBehaviour
     void Update()
     {
         
-        if (Input.GetKeyDown(KeyCode.LeftControl) && mbsDemon.iDemonState == 0 && !isWandAttack)
+        if (Input.GetMouseButtonDown(0) && mbsDemon.iDemonState == 0 && !isWandAttack && mbsDemon.iDemonType == vDemonWandIndex)
         {
             StartCoroutine(FnWand());
            // Cursor.visible = true;
@@ -65,6 +66,8 @@ public class MBSWandAttack : MonoBehaviour
        // Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 
+        GetComponent<AudioSource>().Play();
+
    
         gTarget.gameObject.SetActive(false);
         gTargetLightning.gameObject.SetActive(false);
@@ -76,7 +79,7 @@ public class MBSWandAttack : MonoBehaviour
         gObjectHit = mbsAim.FnAim(vMouseFinal);
         if (gObjectHit != null)
         {
-            Debug.Log("lightning hits " + gObjectHit.name);
+            Debug.Log("lightning hits " + gObjectHit.name + " Tag: - " + gObjectHit.tag);
 
             if (gObjectHit.GetComponent<ShootableBox>() != null)
             {

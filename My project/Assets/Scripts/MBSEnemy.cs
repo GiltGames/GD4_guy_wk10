@@ -1,4 +1,5 @@
 using System.Collections;
+
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -21,6 +22,9 @@ public class MBSEnemy : MonoBehaviour
     [SerializeField] RaycastHit vRaycastHit;
     [SerializeField] Vector3 vLookVector;
     [SerializeField] float vMeleeRange;
+    [SerializeField] float vStopApproachingRange;
+
+
     [SerializeField] float vTimeAttackEnd;
     [SerializeField] float vTimeAttackTakes;
     [SerializeField] float vMagicAttackBuildUp;
@@ -57,23 +61,62 @@ public class MBSEnemy : MonoBehaviour
     [SerializeField] GameObject aura;
     [SerializeField] MBSRag3 mbsRag;
 
+    [SerializeField] GameObject gMeleeDetector;
+    [SerializeField] Collider cColTmp;
+    [SerializeField] bool isColliderOffWhenAlive;
+
+    [SerializeField] AudioSource aSource;
+    [SerializeField] AudioClip[] aClip;
+
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+
+        currentHealth = maxHealth;
         gPlayer = FindFirstObjectByType<MBSPlayerMove>().transform;
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         lineRenderer = gLine.GetComponent<LineRenderer>();
         mbsRag = GetComponent<MBSRag3>();
         mbsRag.FnRagDollOff();
-        GetComponent<Collider>().enabled = true;
+        cColTmp = GetComponent<Collider>();
+        cColTmp.enabled = true;
+        aSource = GetComponent<AudioSource>();
+
+        aSource.enabled = true;
+        aSource.clip = aClip[4];
+        aSource.Play();
+        aSource.loop = true;
         
     }
 
     // Update is called once per frame
     void Update()
     {
+        
+        // this corrects an error - for some reason the collider turns off on start, and this corrects that and checks if it is off
+        //and turns it back on. 
+        
+        isColliderOffWhenAlive = cColTmp.enabled;
+        if (!isColliderOffWhenAlive && vState !=5 )
+        {
+            cColTmp.enabled = true;
+        }
+
+
+        if (isHitPlayer)
+        {
+            gPlayer.GetComponent<MBSPlayerHealth>().FnPlayerDamage(vDamageMelee, 0);
+
+
+
+            gWeapon.gameObject.SetActive(false);
+            isHitPlayer = false;
+
+        }
+
 
         vDistance = Vector3.Distance(gPlayer.position, transform.position);
         vAngle = Vector3.Angle(vLookVector, gEye.transform.forward);
@@ -87,6 +130,7 @@ public class MBSEnemy : MonoBehaviour
             if (vDistance < vListenDistance)
             {
                 vState = 2;
+                animator.SetBool("Active", true);
 
             }
 
@@ -108,7 +152,7 @@ public class MBSEnemy : MonoBehaviour
                     {
 
                         vState = 2;
-
+                        animator.SetBool("Active", true);
                     }
 
 
@@ -161,7 +205,7 @@ public class MBSEnemy : MonoBehaviour
         {
             // increase buildup - change this
             
-            vMagicAttackBuildUp += vMagicAttackIncreaseThreat * Time.deltaTime;
+            vMagicAttackBuildUp +=( vMagicAttackIncreaseThreat * Time.deltaTime);
 
             if (vMagicAttackBuildUp > vMagicAttackThreshold * vFireSummonThreshold)
             {
@@ -181,6 +225,7 @@ public class MBSEnemy : MonoBehaviour
                 //same time as melee -- may need to change - change the multiple at the end
                 vTimeAttackEnd = Time.time + vTimeAttackTakes * vMagicAttackTimeMulti;
                    vMagicCastTime = Time.time + vCastTime; 
+
 
             }
 
@@ -260,29 +305,51 @@ public class MBSEnemy : MonoBehaviour
 
     void FnClose()
     {
-        agent.destination = gPlayer.position;
-        animator.SetBool("Walk", true);
+        animator.SetBool("Active",true);
+
+       
+
+        if (vDistance > vStopApproachingRange)
+        {
+
+            agent.destination = gPlayer.position;
+            animator.SetBool("Walk", true);
+
+        }
+
+        else
+        {
+            agent.destination = transform.position;
+            animator.SetBool("Walk", false);
+
+
+        }
 
     }
 
     void FnAttack()
     {
         agent.destination = transform.position;
+
+        Quaternion targetRot = Quaternion.LookRotation(gPlayer.position - transform.position);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, 60 * Time.deltaTime);
         
-        if(isHitPlayer)
-        {
+        aSource.Stop();
+        aSource.clip = aClip[2];
+        aSource.Play();
 
-
-        }
-
-        
         if (vTimeAttackEnd < Time.time)
         {
             animator.SetBool("Walk", true);
             vState = 2;
-            gWeapon.gameObject.SetActive(true);
+            gWeapon.gameObject.SetActive(false);
+
+            aSource.Stop();
+            aSource.clip = aClip[4];
+            aSource.Play();
 
         }
+
 
 
 
@@ -293,16 +360,21 @@ public class MBSEnemy : MonoBehaviour
     {
         agent.destination = transform.position;
 
+        Quaternion targetRot = Quaternion.LookRotation(gPlayer.position - transform.position);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, 60 * Time.deltaTime);
+
+      
+
         if (vMagicCastTime < Time.time)
         {
             gLine.SetActive(true);
             gFirepoint.SetActive(false);
 
+            StartCoroutine(PlayTemp(aClip[1]));
 
 
 
-            
-            
+
 
 
             vTargetLine = gPlayer.position;
@@ -327,7 +399,7 @@ public class MBSEnemy : MonoBehaviour
                     gPlayer.GetComponent<Rigidbody>().isKinematic = false;
                     gPlayer.GetComponent<Rigidbody>().AddForce(vShove,ForceMode.Impulse);
 
-                    gPlayer.GetComponent<MBSPlayerHealth>().FnPlayerDamage(Mathf.CeilToInt( vDamageMagic * Time.deltaTime));
+                    gPlayer.GetComponent<MBSPlayerHealth>().FnPlayerDamage(vDamageMagic * Time.deltaTime,1);
 
                     Debug.Log("Ray hits player");
 
@@ -341,6 +413,7 @@ public class MBSEnemy : MonoBehaviour
             lineRenderer.SetPosition(0, gFirepoint.transform.position);
             lineRenderer.SetPosition(1, vTargetLine);
 
+          
 
 
 
@@ -351,8 +424,12 @@ public class MBSEnemy : MonoBehaviour
 
         if (vTimeAttackEnd < Time.time)
         {
+           
             animator.SetBool("Walk", true);
             vState = 2;
+
+               
+           
             gLine.SetActive(false);
             gPlayer.GetComponent<Rigidbody>().isKinematic = true;
         }
@@ -366,13 +443,18 @@ public class MBSEnemy : MonoBehaviour
     {
         currentHealth -= damage;
 
+        StartCoroutine(PlayTemp(aClip[3]));
+
+
+
+
         Color auraColor = Color.white;
         auraColor.a = currentHealth / maxHealth * vFade;
         auraColor.b = 0;
         auraColor.r = 1 - (currentHealth / maxHealth);
         auraColor.g = currentHealth / maxHealth;
         aura.GetComponent<Renderer>().material.color = auraColor;
-
+        animator.SetTrigger("Hit");
 
 
 
@@ -387,11 +469,29 @@ public class MBSEnemy : MonoBehaviour
             animator.enabled = false;
             agent.enabled = false;
             vState = 5;
+            
 
         }
 
 
     }
 
+
+    IEnumerator PlayTemp(AudioClip clip)
+    {
+
+        aSource.Stop();
+        aSource.loop = false;
+        aSource.clip = clip;
+        aSource.Play();
+
+
+
+        yield return new WaitForSeconds(2);
+        aSource.Stop();
+        aSource.clip = aClip[4];
+        aSource.Play();
+        aSource.loop = true;
+    }
    
 }

@@ -10,6 +10,7 @@ public class ShootableBox : MonoBehaviour {
 	[SerializeField] int maxHealth = 30;
 	[SerializeField] GameObject aura;
 	[SerializeField] float vFade =.5f;
+	[SerializeField] Color auraColor;
 	
 
 	void Start()
@@ -25,7 +26,9 @@ public class ShootableBox : MonoBehaviour {
 		//subtract damage amount when Damage function is called
 		currentHealth -= damageAmount;
 
-		Color auraColor = Color.white;
+		Debug.Log(gameObject.name + " takes damage of " + damageAmount);
+
+		auraColor = aura.GetComponent<Renderer>().material.color;
 		auraColor.a = currentHealth/maxHealth * vFade;
 		auraColor.b = 0;
 		auraColor.r = 1 - (currentHealth/maxHealth);
@@ -41,7 +44,7 @@ public class ShootableBox : MonoBehaviour {
 			//if health has fallen below zero, deactivate it 
 
 		
-			GetComponent<Collider>().enabled = false;	
+			GameObject.Destroy(gameObject);
 
 		}
 
