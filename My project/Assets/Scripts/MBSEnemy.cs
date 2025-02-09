@@ -469,6 +469,7 @@ public class MBSEnemy : MonoBehaviour
             animator.enabled = false;
             agent.enabled = false;
             vState = 5;
+            aSource.enabled = false;    
             
 
         }
