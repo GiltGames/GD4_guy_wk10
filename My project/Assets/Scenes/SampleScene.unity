@@ -22460,7 +22460,7 @@ MonoBehaviour:
   vJumpForce: 6
   vJumpSpeed: 0
   vJumpDecay: 0
-  vLookUpLimit: 45
+  vLookUpLimit: 25
   vLookDirUpDown: 0
   vMoveDir: {x: 0, y: 0, z: 0}
   vMoveDirSide: {x: 0, y: 0, z: 0}
@@ -22679,6 +22679,7 @@ MonoBehaviour:
   gHitImage: {fileID: 1873892078}
   vFadeRate: 0.6
   vHitA: 0
+  mbsFade: {fileID: 0}
 --- !u!82 &394186248
 AudioSource:
   m_ObjectHideFlags: 0
@@ -54287,6 +54288,7 @@ GameObject:
   m_Component:
   - component: {fileID: 832575519}
   - component: {fileID: 832575518}
+  - component: {fileID: 832575520}
   m_Layer: 0
   m_Name: Global Volume
   m_TagString: Untagged
@@ -54326,6 +54328,30 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &832575520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 832575517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b66380d569bb914f9b592d0e3634ca6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gVol: {fileID: 0}
+  gVig: {fileID: 0}
+  gColorAdj: {fileID: 0}
+  vVigStart: 0
+  vVigEnd: 0
+  vSaturationSt: 0
+  vSatuationEnd: 0
+  vFadeTime: 1
+  vVigTmp: 0
+  vSatTmp: 0
+  vErrorAllowance: 0.05
+  isFading: 0
 --- !u!4 &842735549 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 829952211679526009, guid: 0694c2be9a9eae9418f8587aa5efbb64, type: 3}

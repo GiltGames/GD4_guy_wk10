@@ -480,19 +480,22 @@ public class MBSEnemy : MonoBehaviour
 
     IEnumerator PlayTemp(AudioClip clip)
     {
+        
 
         aSource.Stop();
         aSource.loop = false;
         aSource.clip = clip;
         aSource.Play();
-
+        Debug.Log(transform.name + " plays " + aSource.clip.name);
 
 
         yield return new WaitForSeconds(2);
+        
         aSource.Stop();
         aSource.clip = aClip[4];
         aSource.Play();
         aSource.loop = true;
+        Debug.Log(transform.name + " plays " + aSource.clip.name);
     }
    
 }

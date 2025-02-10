@@ -14,18 +14,22 @@ public class MBSPlayerHealth : MonoBehaviour
     [SerializeField] Image gHitImage;
     [SerializeField] float vFadeRate = 0.1f;
     [SerializeField] float vHitA;
+    [SerializeField] MBSFade mbsFade;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         mbsDemon = FindFirstObjectByType<MBSDemon>();
-        
+        mbsFade = FindFirstObjectByType<MBSFade>();
 
     }
 
     // Update is called once per frame
     void Update()
     {
+       // redundant screen effect
+        
+        /*
         if (vHitA > 0)
         {
             vHitA -= vFadeRate * Time.deltaTime;
@@ -44,6 +48,7 @@ public class MBSPlayerHealth : MonoBehaviour
             
 
         }
+        */
     }
 
     public void FnPlayerDamage(float damage,int type)
@@ -58,6 +63,9 @@ public class MBSPlayerHealth : MonoBehaviour
         {
 
             vPlayerHealth -= damage;
+
+            mbsFade.FadeStart((0.4f + damage / vPlayerMaxHealth *.6f));
+
             vHealthSlider.value = vPlayerHealth;
 
             if (vPlayerHealth <= 0)
@@ -67,8 +75,11 @@ public class MBSPlayerHealth : MonoBehaviour
                 gGameOverScreen.SetActive(true);
             }
 
-            gHitScreen.SetActive(true);
-            vHitA = .3f + damage / 100;
+            // redudant damage effect
+
+
+            // gHitScreen.SetActive(true);
+            // vHitA = .3f + damage / 100;
            
 
 
