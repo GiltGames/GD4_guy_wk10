@@ -89,7 +89,8 @@ public class MBSEnemy : MonoBehaviour
         aSource.clip = aClip[4];
         aSource.Play();
         aSource.loop = true;
-        
+        aSource.volume = .5f;
+
     }
 
     // Update is called once per frame
@@ -194,7 +195,9 @@ public class MBSEnemy : MonoBehaviour
             isHitPlayer = false;
             animator.SetTrigger("Attack");
             gWeapon.gameObject.SetActive(true);
-           
+
+            StartCoroutine(PlayTemp(aClip[2]));
+
             vTimeAttackEnd = Time.time + vTimeAttackTakes;
 
         }
@@ -333,21 +336,18 @@ public class MBSEnemy : MonoBehaviour
 
         Quaternion targetRot = Quaternion.LookRotation(gPlayer.position - transform.position);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, 60 * Time.deltaTime);
-        
-        aSource.Stop();
-        aSource.clip = aClip[2];
-        aSource.Play();
+
+      
 
         if (vTimeAttackEnd < Time.time)
         {
+          
+
             animator.SetBool("Walk", true);
             vState = 2;
             gWeapon.gameObject.SetActive(false);
 
-            aSource.Stop();
-            aSource.clip = aClip[4];
-            aSource.Play();
-
+            
         }
 
 
@@ -485,6 +485,7 @@ public class MBSEnemy : MonoBehaviour
         aSource.Stop();
         aSource.loop = false;
         aSource.clip = clip;
+        aSource.volume = 1;
         aSource.Play();
         Debug.Log(transform.name + " plays " + aSource.clip.name);
 
@@ -495,6 +496,7 @@ public class MBSEnemy : MonoBehaviour
         aSource.clip = aClip[4];
         aSource.Play();
         aSource.loop = true;
+        aSource.volume = .5f;
         Debug.Log(transform.name + " plays " + aSource.clip.name);
     }
    
